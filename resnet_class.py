@@ -1,4 +1,5 @@
 import torch.nn as nn
+from torchvision.models import ResNet50_Weights
 from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 
 class ResnetClass(nn.Module):
@@ -6,7 +7,7 @@ class ResnetClass(nn.Module):
 
         super().__init__()
 
-        self.backbone = resnet_fpn_backbone('resnet50', pretrained = True)
+        self.backbone = resnet_fpn_backbone(backbone_name='resnet50', weights=ResNet50_Weights.IMAGENET1K_V1)
 
         self.upsample = nn.Upsample(scale_factor=4, mode='bilinear', align_corners=False)
 

@@ -11,6 +11,7 @@ from visuals_class import plot_loss, stitch_images
 from classdistribution import class_distribution
 from dataset import MyDataset
 from tqdm import tqdm
+import sys
 
 
 def machine_learning(epochs, classes, patches = 'True'):
@@ -41,9 +42,8 @@ def machine_learning(epochs, classes, patches = 'True'):
         scores = []
         resnet.train()
 
-        with tqdm(total=len(train_loaded_set), desc='Training') as pbar:
+        with tqdm(total=len(train_loaded_set), desc='Training', file=sys.stdout) as pbar:
             for number, (image, mask, file) in enumerate(train_loaded_set):
-
                 image = image.to(device)
                 mask = mask.long().to(device)
                 weight_manager.zero_grad()
@@ -51,15 +51,15 @@ def machine_learning(epochs, classes, patches = 'True'):
                 loss = loss1(output, mask)
                 loss.backward()
                 weight_manager.step()
-                pbar.update(1)
                 loss_train_epoch.append(loss.item())
+                pbar.update(1)
 
 
         loss_train.append(sum(loss_train_epoch) / len(loss_train_epoch))
 
         resnet.eval()
 
-        with tqdm(total=len(validation_loaded_set), desc='Validating') as pbar:
+        with tqdm(total=len(validation_loaded_set), desc='Validating', file=sys.stdout) as pbar:
             with torch.no_grad():
                 for number, (image, mask, file) in enumerate(validation_loaded_set):
                     image = image.to(device) #(1, H, W)
@@ -81,8 +81,8 @@ def machine_learning(epochs, classes, patches = 'True'):
                     mask_array = mask.flatten().cpu().numpy() #(1 * H * W)
                     scores.append(f1_score(y_true=mask_array, y_pred=output_array, average = 'macro'))
 
-                    pbar.update(1)
                     loss_validation_epoch.append(loss.item())
+                    pbar.update(1)
 
         loss_eval.append(sum(loss_validation_epoch) / len(loss_validation_epoch))
 

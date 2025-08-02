@@ -15,8 +15,9 @@
 * First the images are passed through a Convolutional layer as tensors
 * In the Convolution (typically) a 3x3 kernel calculates the dot product for each set of 3x3 pixels in the image
 * the result is put onto an output 2D feature map
-* In sum, its essentially a linear operation: output = W * input + b
-* b is a bias that can be set but it isnt useful for our purposes
+* In sum, it's essentially a linear operation: output = W * input + b
+* b is a bias that can be set to encourage or discourage neuron death
+* We choose not to use it in this project
 * W is the kernel which is also referred to as the weight
 * Since there are typically 100s of kernels in a single convolution, all the output feature maps are stacked in a new tensor which is output to the BatchNorm function
 * the BatchNorm function keeps all the tensor values within a range of (-1,1) with a standard deviation of 1
