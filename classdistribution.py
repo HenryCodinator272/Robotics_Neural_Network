@@ -9,6 +9,6 @@ def class_distribution(dataset, classes):
 
     total = class_list.sum().item()
     for index in range(classes):
-        print(f'Class {index}: {(class_list[index].item() / total * 100):.4f}')
+        print(f'Class {index}: {(class_list[index].item() / total * 100):.4f}%')
 
 

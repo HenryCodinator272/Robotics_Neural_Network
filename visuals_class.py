@@ -29,9 +29,10 @@ def plot_loss(train, evaluation, current_epoch):
     plt.savefig('graph_results/loss.png')
     plt.close()
 
-def stitch_images(file_number, mask_image):
-    for file in os.listdir('saved_images'):
-        os.remove(f'saved_images/{file}')
+def stitch_images(file_number, mask_image, switch = 'add'):
+    if switch == 'delete':
+        for file in os.listdir('saved_images'):
+            os.remove(f'saved_images/{file}')
     with Image.open(f'images/rgb_images/IMG_{file_number}') as img:
         img = img.convert('L')
         visual = np.array(img)

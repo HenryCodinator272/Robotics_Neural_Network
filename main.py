@@ -14,7 +14,9 @@ from tqdm import tqdm
 import sys
 
 
-def machine_learning(epochs, classes, patches = 'True'):
+def machine_learning(epochs, classes, patches = True, layers = 1, back_bone = True):
+
+    # -------------------------------------------------------------------------------
 
     dataset = MyDataset(stride = 16, patch_size = 32, patches = patches)
     class_distribution(dataset, classes)
@@ -30,9 +32,11 @@ def machine_learning(epochs, classes, patches = 'True'):
     validation_loaded_set = DataLoader(validation_set, batch_size=4, shuffle=True)
 
     loss1 = nn.CrossEntropyLoss()
-    resnet = ResnetClass(classes = classes).to(device)
+    resnet = ResnetClass(classes = classes, additional_layers = layers, fpn_back_bone = back_bone).to(device)
     weight_manager = torch.optim.Adam(resnet.parameters(), lr=0.001)
     loss_train, loss_eval = [0.0], [0.0]
+
+    # -------------------------------------------------------------------------------
 
     for epoch in range(epochs):
 
@@ -40,6 +44,9 @@ def machine_learning(epochs, classes, patches = 'True'):
         print(f'Epoch {epoch + 1}/{epochs}:')
 
         scores = []
+
+        # -------------------------------------------------------------------------------
+
         resnet.train()
 
         with tqdm(total=len(train_loaded_set), desc='Training', file=sys.stdout) as pbar:
@@ -57,25 +64,33 @@ def machine_learning(epochs, classes, patches = 'True'):
 
         loss_train.append(sum(loss_train_epoch) / len(loss_train_epoch))
 
+        # -------------------------------------------------------------------------------
+
         resnet.eval()
 
         with tqdm(total=len(validation_loaded_set), desc='Validating', file=sys.stdout) as pbar:
             with torch.no_grad():
                 for number, (image, mask, file) in enumerate(validation_loaded_set):
+
                     image = image.to(device) #(1, H, W)
                     mask = mask.long().to(device) #(1, H, W)
                     output = resnet.forward(image) #(1, C, H, W)
                     loss = loss1(output, mask) #tensor scalar
 
-                    if number == 0:
 
-                        pred_class = torch.argmax(output, dim=1) #(B, H, W)
-                        pred_class = pred_class[0].cpu().numpy().astype('uint8')
-                        pred_class = pred_class * 50
-
+                    #-------------------------------------------------------------------------------
+                    count = 0
+                    pred_class = torch.argmax(output, dim=1) #(B, H, W)
+                    for images in range(len(pred_class)):
+                        pred_class_np = pred_class[images].cpu().numpy().astype('uint8')
+                        pred_class_np *= 50
                         os.makedirs('saved_images', exist_ok=True)
-
-                        stitch_images(file[0][-8:], pred_class)
+                        if number == count == 0:
+                            stitch_images(file[images][-8:], pred_class_np, 'delete')
+                        else:
+                            stitch_images(file[images][-8:], pred_class_np)
+                        count += 1
+                    # -------------------------------------------------------------------------------
 
                     output_array = torch.argmax(output, dim=1).flatten().cpu().numpy() #(1 * H * W)
                     mask_array = mask.flatten().cpu().numpy() #(1 * H * W)
@@ -86,12 +101,15 @@ def machine_learning(epochs, classes, patches = 'True'):
 
         loss_eval.append(sum(loss_validation_epoch) / len(loss_validation_epoch))
 
+        # -------------------------------------------------------------------------------
 
         plot_loss(loss_train, loss_eval, epoch + 1)
         macro_f1 = np.mean(np.array(scores))
         print(f'Epoch {epoch + 1}: {macro_f1:.4f}')
 
-machine_learning(epochs = 30, classes = 3, patches = 'False')
+# -------------------------------------------------------------------------------
+
+machine_learning(epochs = 10, classes = 3, patches = False, layers = 1, back_bone = True)
 
 
 

@@ -68,6 +68,6 @@
 
 ## Running the Code
 
-* You can edit the configs in the called machine learning function at the end of `image_processing.py`
+* You can edit the configs in the called machine learning function at the end of `main.py`
 * if you set patches to `True` then it'll separate each image into smaller patches (it'll take much longer and it's not advised for resnet-50)
 * you can see a visual of the gt_prediction in `saved_images`
