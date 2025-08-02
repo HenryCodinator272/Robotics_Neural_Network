@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from resnet_class import ResnetClass
 import torch.nn as nn
 from PIL import Image
-from visuals_class import plot_loss
+from visuals_class import plot_loss, stitch_images
 from classdistribution import class_distribution
 from dataset import MyDataset
 from tqdm import tqdm
@@ -75,14 +75,7 @@ def machine_learning(epochs, classes, patches = 'True'):
 
                         os.makedirs('saved_images', exist_ok=True)
 
-                        try:
-                            old_file = os.listdir('saved_images')[0]
-                            Image.fromarray(pred_class).save(f'saved_images/{old_file}')
-                            os.rename(f'saved_images/{old_file}', f'saved_images/{file[0]}')
-                        except FileNotFoundError:
-                            Image.fromarray(pred_class).save(f'saved_images/{file[0]}')
-                        finally:
-                            pass
+                        stitch_images(file[0][-8:], pred_class)
 
                     output_array = torch.argmax(output, dim=1).flatten().cpu().numpy() #(1 * H * W)
                     mask_array = mask.flatten().cpu().numpy() #(1 * H * W)
@@ -98,7 +91,7 @@ def machine_learning(epochs, classes, patches = 'True'):
         macro_f1 = np.mean(np.array(scores))
         print(f'Epoch {epoch + 1}: {macro_f1:.4f}')
 
-machine_learning(epochs = 20, classes = 3, patches = 'False')
+machine_learning(epochs = 30, classes = 3, patches = 'False')
 
 
 

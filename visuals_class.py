@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+from PIL import Image
 
 def plot_loss(train, evaluation, current_epoch):
 
@@ -27,4 +28,14 @@ def plot_loss(train, evaluation, current_epoch):
     os.makedirs('graph_results', exist_ok = True)
     plt.savefig('graph_results/loss.png')
     plt.close()
+
+def stitch_images(file_number, mask_image):
+    for file in os.listdir('saved_images'):
+        os.remove(f'saved_images/{file}')
+    with Image.open(f'images/rgb_images/IMG_{file_number}') as img:
+        img = img.convert('L')
+        visual = np.array(img)
+        combined_array = np.hstack([mask_image, visual])
+        Image.fromarray(combined_array).save(f'saved_images/IMG_{file_number}')
+
 
