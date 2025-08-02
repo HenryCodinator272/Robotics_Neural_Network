@@ -36,6 +36,6 @@ def stitch_images(file_number, mask_image):
         img = img.convert('L')
         visual = np.array(img)
         combined_array = np.hstack([mask_image, visual])
-        Image.fromarray(combined_array).save(f'saved_images/IMG_{file_number}')
+        Image.fromarray(combined_array).save(f'saved_images/image_{file_number}')
 
 
